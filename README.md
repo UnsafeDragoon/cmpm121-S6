@@ -1,6 +1,17 @@
-# D1 starter
+# The Midnight Bakery
 
-A minimal TypeScript/Vite browser project with Deno checks and GitHub Pages deployment.
+A minimal cookie-clicker game — TypeScript/Vite browser project with Deno checks and GitHub Pages deployment.
+
+## How it plays
+
+- **Bake a cookie by hand** — each click adds 1 cookie.
+- **Upgrades** — Bigger oven, Cookie farm, Dough golem. Each purchase raises the bakery's automatic production; costs evolve as you buy.
+- Production accrues per real elapsed second (frame-rate independent).
+
+## Design notes
+
+- `src/game.ts` — all game rules and upgrade content as data (SRP: rules only).
+- `src/main.ts` — DOM rendering and input only; new upgrades need no new UI logic.
 
 ## Credits
 
