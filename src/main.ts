@@ -30,15 +30,25 @@ function formatCookies(amount: number): string {
 }
 
 function render(): void {
-  counter.textContent = formatCookies(cookies);
+  counter.textContent = formatCookies(Math.floor(cookies));
 }
 
-// Step 3: Timed growth. +1 cookie per second, on top of manual clicks.
+// Step 4: Elapsed-time animation. Growth = rate × real elapsed seconds,
+// measured via requestAnimationFrame, so it's frame-rate independent.
 const COOKIES_PER_SECOND = 1;
-setInterval(() => {
-  cookies += COOKIES_PER_SECOND;
-  render();
-}, 1000);
+let lastTick = performance.now();
+
+function tick(now: number): void {
+  const elapsed = (now - lastTick) / 1000;
+  lastTick = now;
+  if (elapsed > 0) {
+    cookies += COOKIES_PER_SECOND * elapsed;
+    render();
+  }
+  requestAnimationFrame(tick);
+}
+
+requestAnimationFrame(tick);
 
 // Step 1: A button you can click.
 // Created in TypeScript, given an identity, wired with an event listener.
