@@ -33,6 +33,13 @@ function render(): void {
   counter.textContent = formatCookies(cookies);
 }
 
+// Step 3: Timed growth. +1 cookie per second, on top of manual clicks.
+const COOKIES_PER_SECOND = 1;
+setInterval(() => {
+  cookies += COOKIES_PER_SECOND;
+  render();
+}, 1000);
+
 // Step 1: A button you can click.
 // Created in TypeScript, given an identity, wired with an event listener.
 const cookieButton = document.createElement("button");
