@@ -31,24 +31,53 @@ function formatCookies(amount: number): string {
 
 function render(): void {
   counter.textContent = formatCookies(Math.floor(cookies));
+  renderUpgrade();
 }
 
 // Step 4: Elapsed-time animation. Growth = rate × real elapsed seconds,
 // measured via requestAnimationFrame, so it's frame-rate independent.
-const COOKIES_PER_SECOND = 1;
+let cookiesPerSecond = 1;
 let lastTick = performance.now();
 
 function tick(now: number): void {
   const elapsed = (now - lastTick) / 1000;
   lastTick = now;
   if (elapsed > 0) {
-    cookies += COOKIES_PER_SECOND * elapsed;
+    cookies += cookiesPerSecond * elapsed;
     render();
   }
   requestAnimationFrame(tick);
 }
 
 requestAnimationFrame(tick);
+
+// Step 5: A consequential upgrade. Spend cookies on a bigger oven that
+// raises production; the button only works when affordable.
+let ownedUpgrades = 0;
+
+function upgradeCost(): number {
+  return 10 * 2 ** ownedUpgrades;
+}
+
+const upgradeButton = document.createElement("button");
+upgradeButton.id = "upgrade-button";
+upgradeButton.type = "button";
+
+function renderUpgrade(): void {
+  const cost = upgradeCost();
+  upgradeButton.textContent = `Bigger oven (+1 cookie/sec) — cost: ${cost} cookies (owned: ${ownedUpgrades})`;
+  upgradeButton.disabled = cookies < cost;
+}
+
+upgradeButton.addEventListener("click", () => {
+  const cost = upgradeCost();
+  if (cookies < cost) return;
+  cookies -= cost;
+  ownedUpgrades += 1;
+  cookiesPerSecond += 1;
+  render();
+  renderUpgrade();
+});
 
 // Step 1: A button you can click.
 // Created in TypeScript, given an identity, wired with an event listener.
@@ -62,4 +91,5 @@ cookieButton.addEventListener("click", () => {
   render();
 });
 
-app.append(heading, image, counter, message, cookieButton);
+app.append(heading, image, counter, message, cookieButton, upgradeButton);
+renderUpgrade();
