@@ -29,55 +29,54 @@ function formatCookies(amount: number): string {
   return amount === 1 ? "1 cookie" : `${amount} cookies`;
 }
 
-function render(): void {
-  counter.textContent = formatCookies(Math.floor(cookies));
-  renderUpgrade();
+// Step 6: Multiple upgrades. Each has its own cost curve and effect;
+// production is derived from what's owned so feedback can't drift from state.
+const UPGRADES = [
+  {
+    id: "oven",
+    label: "Bigger oven",
+    effect: "+1 cookie/sec",
+    baseCost: 10,
+    costGrowth: 2,
+    rateBonus: 1,
+    owned: 0,
+  },
+  {
+    id: "farm",
+    label: "Cookie farm",
+    effect: "+5 cookie/sec",
+    baseCost: 100,
+    costGrowth: 3,
+    rateBonus: 5,
+    owned: 0,
+  },
+];
+
+function upgradeCost(u: (typeof UPGRADES)[number]): number {
+  return u.baseCost * u.costGrowth ** u.owned;
+}
+
+function rateOf(): number {
+  return UPGRADES.reduce((total, u) => total + u.owned * u.rateBonus, 1);
+}
+
+function rateText(): string {
+  return `Production: ${rateOf()} cookie/sec`;
 }
 
 // Step 4: Elapsed-time animation. Growth = rate × real elapsed seconds,
 // measured via requestAnimationFrame, so it's frame-rate independent.
-let cookiesPerSecond = 1;
 let lastTick = performance.now();
 
 function tick(now: number): void {
   const elapsed = (now - lastTick) / 1000;
   lastTick = now;
   if (elapsed > 0) {
-    cookies += cookiesPerSecond * elapsed;
+    cookies += rateOf() * elapsed;
     render();
   }
   requestAnimationFrame(tick);
 }
-
-requestAnimationFrame(tick);
-
-// Step 5: A consequential upgrade. Spend cookies on a bigger oven that
-// raises production; the button only works when affordable.
-let ownedUpgrades = 0;
-
-function upgradeCost(): number {
-  return 10 * 2 ** ownedUpgrades;
-}
-
-const upgradeButton = document.createElement("button");
-upgradeButton.id = "upgrade-button";
-upgradeButton.type = "button";
-
-function renderUpgrade(): void {
-  const cost = upgradeCost();
-  upgradeButton.textContent = `Bigger oven (+1 cookie/sec) — cost: ${cost} cookies (owned: ${ownedUpgrades})`;
-  upgradeButton.disabled = cookies < cost;
-}
-
-upgradeButton.addEventListener("click", () => {
-  const cost = upgradeCost();
-  if (cookies < cost) return;
-  cookies -= cost;
-  ownedUpgrades += 1;
-  cookiesPerSecond += 1;
-  render();
-  renderUpgrade();
-});
 
 // Step 1: A button you can click.
 // Created in TypeScript, given an identity, wired with an event listener.
@@ -91,5 +90,39 @@ cookieButton.addEventListener("click", () => {
   render();
 });
 
-app.append(heading, image, counter, message, cookieButton, upgradeButton);
-renderUpgrade();
+function render(): void {
+  counter.textContent = formatCookies(Math.floor(cookies));
+  rateLine.textContent = rateText();
+  for (const u of upgradeButtons) {
+    const cost = upgradeCost(u.upgrade);
+    u.button.textContent =
+      `${u.upgrade.label} — ${u.upgrade.effect} — cost: ${cost} (owned: ${u.upgrade.owned})`;
+    u.button.disabled = cookies < cost;
+  }
+}
+
+const rateLine = document.createElement("p");
+rateLine.id = "production-rate";
+rateLine.textContent = rateText();
+
+// One button per upgrade, each wired to purchase its own upgrade.
+const upgradeButtons = UPGRADES.map((u) => {
+  const button = document.createElement("button");
+  button.id = `upgrade-${u.id}`;
+  button.type = "button";
+  button.addEventListener("click", () => {
+    const cost = upgradeCost(u);
+    if (cookies < cost) return;
+    cookies -= cost;
+    u.owned += 1;
+    render();
+  });
+  return { upgrade: u, button };
+});
+
+app.append(heading, image, counter, rateLine, message, cookieButton);
+for (const { button } of upgradeButtons) {
+  app.append(button);
+}
+render();
+requestAnimationFrame(tick);
