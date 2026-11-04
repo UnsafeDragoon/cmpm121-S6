@@ -1,0 +1,84 @@
+/* The Midnight Bakery — night-oven theme */
+:root {
+  --night: #17121f;
+  --night-soft: #241b31;
+  --lantern: #e8b56a;
+  --cream: #f5e2b8;
+  --dough: #c98f3f;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 50% -20%, #332447 0%, var(--night) 60%);
+  color: var(--cream);
+  font-family: Georgia, "Times New Roman", serif;
+  display: flex;
+  justify-content: center;
+}
+
+#app {
+  max-width: 420px;
+  width: 100%;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+h1 {
+  letter-spacing: 0.06em;
+  font-weight: normal;
+  color: var(--lantern);
+  text-shadow: 0 0 18px rgba(232, 181, 106, 0.45);
+  margin: 0 0 1rem;
+}
+
+#cookie-image {
+  cursor: pointer;
+  width: 180px;
+  height: 180px;
+  transition: transform 0.1s ease;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+#cookie-image:active {
+  transform: scale(0.9);
+}
+
+#cookie-counter {
+  font-size: 1.6rem;
+  margin: 1rem 0 0.2rem;
+}
+
+#production-rate,
+.upgrade-info {
+  color: #a893c4;
+  font-size: 0.9rem;
+  margin: 0.2rem 0;
+}
+
+button {
+  display: block;
+  width: 100%;
+  margin: 0.6rem 0;
+  padding: 0.7rem 1rem;
+  background: var(--night-soft);
+  border: 1px solid var(--dough);
+  border-radius: 8px;
+  color: var(--cream);
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  background: #352846;
+  border-color: var(--lantern);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}

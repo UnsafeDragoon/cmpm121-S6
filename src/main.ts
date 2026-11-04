@@ -1,7 +1,8 @@
 // Vite turns this import into a production-safe URL. Keep it as a file so
 // even this tiny example demonstrates a separately deployed asset.
 // @deno-types="./asset-url.d.ts"
-import tileUrl from "./assets/tile.svg?no-inline";
+import "./style.css";
+import cookieUrl from "./assets/cookie.svg?no-inline";
 import {
   advance,
   costOf,
@@ -23,10 +24,9 @@ const heading = document.createElement("h1");
 heading.textContent = "The Midnight Bakery";
 
 const image = document.createElement("img");
-image.src = tileUrl;
+image.id = "cookie-image";
+image.src = cookieUrl;
 image.alt = "A round, moonlit cookie with a cream glaze";
-image.width = 96;
-image.height = 96;
 
 const counter = document.createElement("p");
 counter.id = "cookie-counter";
@@ -34,11 +34,7 @@ counter.id = "cookie-counter";
 const rateLine = document.createElement("p");
 rateLine.id = "production-rate";
 
-const cookieButton = document.createElement("button");
-cookieButton.id = "cookie-button";
-cookieButton.type = "button";
-cookieButton.textContent = "Bake a cookie by hand";
-cookieButton.addEventListener("click", () => {
+image.addEventListener("click", () => {
   game.cookies += 1;
   render();
 });
@@ -50,6 +46,7 @@ const upgradeButtons = UPGRADE_DEFS.map((def) => {
   button.id = `upgrade-${def.id}`;
   button.type = "button";
   const info = document.createElement("p");
+  info.className = "upgrade-info";
   info.textContent = `${def.label} — ${def.description} (${def.effect})`;
   button.addEventListener("click", () => {
     purchase(game, def);
@@ -71,12 +68,14 @@ function render(): void {
   rateLine.textContent = rateText();
   for (const { def, button } of upgradeButtons) {
     const cost = costOf(game, def);
-    button.textContent = `${def.label} — cost: ${cost} (owned: ${ownedOf(game, def.id)})`;
+    button.textContent = `${def.label} — cost: ${cost} (owned: ${
+      ownedOf(game, def.id)
+    })`;
     button.disabled = game.cookies < cost;
   }
 }
 
-app.append(heading, image, counter, rateLine, cookieButton);
+app.append(heading, image, counter, rateLine);
 for (const { info, button } of upgradeButtons) {
   app.append(info, button);
 }
